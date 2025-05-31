@@ -1,0 +1,10 @@
+# Node and build files
+node_modules/
+.cache/
+dist/
+build/
+*.log
+
+# Specific to surveyor-tracking-dashboard
+surveyor-tracking-dashboard/node_modules/
+surveyor-tracking-dashboard/.cache/
