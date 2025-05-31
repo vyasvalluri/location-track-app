@@ -1,0 +1,100 @@
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 280px;
+  z-index: 1000;
+  pointer-events: auto !important;
+}
+
+.ol-popup:after, .ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 50%;
+  margin-left: -10px;
+}
+
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 50%;
+  margin-left: -11px;
+}
+
+.ol-popup-close {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.ol-popup-close:hover {
+  color: #333;
+}
+
+.ol-popup-content {
+  margin-top: 5px;
+  margin-right: 20px;
+}
+
+.ol-popup-title {
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.ol-popup-row {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.ol-popup-label {
+  width: 70px;
+  font-weight: 500;
+  color: #666;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.legend-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
