@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "surveyor")
@@ -27,6 +28,9 @@ public class Surveyor {
     
     @Column
     private String password;
+    
+    @Transient // Not persisted to database
+    private boolean online = false;
 
     // Constructors
     public Surveyor() {}
@@ -38,6 +42,7 @@ public class Surveyor {
         this.projectName = projectName;
         this.username = username;
         this.password = password;
+        this.online = false;
     }
 
     // Getters and setters
@@ -87,6 +92,14 @@ public class Surveyor {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public boolean isOnline() {
+        return online;
+    }
+    
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }
 

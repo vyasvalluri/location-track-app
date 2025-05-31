@@ -44,70 +44,213 @@ body {
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Helvetica Neue', Arial, sans-serif;
   color: #334155;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
+/* Responsive layout fixes */
+@media (max-width: 1200px) {
+  .dashboard-container {
+    padding: 1rem !important;
+  }
+  
+  .dashboard-container > div > div {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  
+  .map-container {
+    min-width: auto !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: 500px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0.5rem !important;
+  }
+  
+  .map-container {
+    height: 400px !important;
+  }
+}
+
+/* Enhanced Date Picker Styling */
+.date-picker {
+  border-radius: 12px !important;
+  border: 2px solid #e5e7eb !important;
+  padding: 0.75rem 1rem !important;
+  width: 100% !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+.date-picker:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+.react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+.react-datepicker__input-container input {
+  border-radius: 12px !important;
+  border: 2px solid #e5e7eb !important;
+  padding: 0.75rem 1rem !important;
+  width: 100% !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+.react-datepicker__input-container input:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Enhanced Card Styling */
 .card {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
-  padding: 2.5rem 2rem;
-  border: 1.5px solid #e0e7ff;
-  transition: box-shadow 0.2s, border 0.2s;
-}
-.card:hover {
-  box-shadow: 0 8px 32px rgba(99,102,241,0.16);
-  border: 1.5px solid #6366f1;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  padding: 2rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
+.card:hover {
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Dashboard Container */
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  border-radius: 18px;
-  background: #fff;
-  padding: 3rem 2.5rem;
-  position: relative;
+  padding: 2rem;
 }
 
-h3, .MuiTypography-h5 {
-  color: #6366f1;
-  font-weight: 800;
-  letter-spacing: 0.7px;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 8px #e0e7ff;
+/* Map Container Enhancements */
+.map-container {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  background: #ffffff;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
-.surveyor-list .MuiListItem-root {
-  margin-bottom: 8px;
-  border-radius: 10px;
-  border: 1px solid #e0e7ff;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(99,102,241,0.06);
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-}
-
-.surveyor-list .MuiListItem-root:last-child {
-  margin-bottom: 0;
-}
-
-.surveyor-list .MuiListItemText-primary {
+/* Status Indicators */
+.status-online {
+  background: linear-gradient(45deg, #10b981 0%, #34d399 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
-.surveyor-list .MuiListItemText-secondary {
-  color: #64748b;
+.status-offline {
+  background: linear-gradient(45deg, #ef4444 0%, #f87171 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-.surveyor-list .MuiListItem-root:hover {
-  background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%) !important;
-  color: #fff !important;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.13);
-  border: 1.5px solid #6366f1;
+/* Animated Loading States */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
-.surveyor-list .MuiListItem-root:hover .MuiListItemText-primary {
-  color: #fff !important;
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-.surveyor-list .MuiListItem-root:hover .MuiListItemText-secondary {
-  color: #e0e7ff !important;
+
+/* Glassmorphism Effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+
+/* Enhanced Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+}
+
+/* Enhanced Form Controls */
+.form-control {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.form-control:focus {
+  border-color: #6366f1;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #4f46e5, #7c3aed);
 }

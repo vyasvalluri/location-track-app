@@ -140,6 +140,13 @@ public class LocationTrackController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
             }
             
+            // Find the surveyor by username to get their ID
+            Surveyor surveyor = surveyorService.findByUsername(username);
+            if (surveyor != null) {
+                // Update activity to mark surveyor as online
+                surveyorService.updateSurveyorActivity(surveyor.getId());
+            }
+            
             // 1. Broadcast via WebSocket as JSON string
             String json = objectMapper.writeValueAsString(message);
             System.out.println("Broadcasting live location: " + json);

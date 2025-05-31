@@ -5,7 +5,20 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Import config.sh if it exists, otherwise set defaults
+if [ -f "./deploy/config.sh" ]; then
+    echo "Loading port configuration from config.sh"
+    source ./deploy/config.sh
+else
+    echo "Using default port configuration"
+    BACKEND_PORT=6060
+    FRONTEND_PORT=3000
+    DATABASE_PORT=5433
+fi
+
 echo -e "${GREEN}Starting deployment process...${NC}"
+echo "Using backend port: $BACKEND_PORT"
+echo "Using frontend port: $FRONTEND_PORT"
 
 # Build Backend
 echo -e "\n${GREEN}Building Spring Boot Backend...${NC}"
@@ -26,7 +39,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-npm run build
+# Use the custom build script that incorporates port configuration
+npm run build:config
 if [ $? -ne 0 ]; then
     echo -e "${RED}Frontend build failed!${NC}"
     exit 1
@@ -62,13 +76,13 @@ else
     echo "Installing serve..."
     npm install -g serve
     echo "Starting Frontend server..."
-    nohup serve -s frontend -l 3000 > frontend.log 2>&1 &
+    nohup serve -s frontend -l $FRONTEND_PORT > frontend.log 2>&1 &
     echo $! > frontend.pid
 fi
 
 echo "Deployment complete!"
-echo "Backend running on port 6060"
-echo "Frontend running on port 3000"
+echo "Backend running on port $BACKEND_PORT"
+echo "Frontend running on port $FRONTEND_PORT"
 EOL
 
 # Create stop script
@@ -105,7 +119,7 @@ server {
 
     # Backend API
     location /api {
-        proxy_pass http://localhost:6060;
+        proxy_pass http://localhost:$BACKEND_PORT;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -115,7 +129,7 @@ server {
 
     # WebSocket endpoint
     location /ws {
-        proxy_pass http://localhost:6060;
+        proxy_pass http://localhost:$BACKEND_PORT;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";

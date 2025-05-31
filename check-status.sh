@@ -31,29 +31,38 @@ else
     echo -e "${RED}✗ Frontend PID file not found${NC}"
 fi
 
-# Check if ports are in use
-echo -e "\n2. Checking Port Status:"
-if netstat -tuln | grep ":6060 " > /dev/null; then
-    echo -e "${GREEN}✓ Backend port (6060) is active${NC}"
+# Import port configurations
+if [ -f "deploy/config.sh" ]; then
+    source deploy/config.sh
 else
-    echo -e "${RED}✗ Backend port (6060) is not active${NC}"
+    # Default values if config file is not found
+    BACKEND_PORT=6060
+    FRONTEND_PORT=3000
 fi
 
-if netstat -tuln | grep ":9090 " > /dev/null; then
-    echo -e "${GREEN}✓ Frontend port (9090) is active${NC}"
+# Check if ports are in use
+echo -e "\n2. Checking Port Status:"
+if netstat -tuln | grep ":${BACKEND_PORT} " > /dev/null; then
+    echo -e "${GREEN}✓ Backend port (${BACKEND_PORT}) is active${NC}"
 else
-    echo -e "${RED}✗ Frontend port (9090) is not active${NC}"
+    echo -e "${RED}✗ Backend port (${BACKEND_PORT}) is not active${NC}"
+fi
+
+if netstat -tuln | grep ":${FRONTEND_PORT} " > /dev/null; then
+    echo -e "${GREEN}✓ Frontend port (${FRONTEND_PORT}) is active${NC}"
+else
+    echo -e "${RED}✗ Frontend port (${FRONTEND_PORT}) is not active${NC}"
 fi
 
 # Check if services are responding
 echo -e "\n3. Checking API Health:"
-if curl -s "http://localhost:6060/api/health" > /dev/null; then
+if curl -s "http://localhost:${BACKEND_PORT}/api/health" > /dev/null; then
     echo -e "${GREEN}✓ Backend API is responding${NC}"
 else
     echo -e "${RED}✗ Backend API is not responding${NC}"
 fi
 
-if curl -s "http://localhost:9090" | grep -q "html"; then
+if curl -s "http://localhost:${FRONTEND_PORT}" | grep -q "html"; then
     echo -e "${GREEN}✓ Frontend is serving content${NC}"
 else
     echo -e "${RED}✗ Frontend is not serving content${NC}"

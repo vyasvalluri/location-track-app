@@ -1,5 +1,31 @@
 // Simple Node.js script to test API connectivity
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+// Read port configuration from config.js or use default values
+let BACKEND_PORT = 6060;
+let FRONTEND_PORT = 3000;
+
+// Try to read the config from the dashboard project
+try {
+  const configFile = path.join(__dirname, 'surveyor-tracking-dashboard/src/config.js');
+  if (fs.existsSync(configFile)) {
+    const configContent = fs.readFileSync(configFile, 'utf8');
+    // Extract BACKEND_API port
+    const backendPortMatch = configContent.match(/BACKEND_API:\s*(\d+)/);
+    if (backendPortMatch && backendPortMatch[1]) {
+      BACKEND_PORT = parseInt(backendPortMatch[1]);
+    }
+    // Extract FRONTEND port
+    const frontendPortMatch = configContent.match(/FRONTEND:\s*(\d+)/);
+    if (frontendPortMatch && frontendPortMatch[1]) {
+      FRONTEND_PORT = parseInt(frontendPortMatch[1]);
+    }
+  }
+} catch (error) {
+  console.warn('Unable to read config file, using default ports', error.message);
+}
 
 const testEndpoint = (url) => {
   console.log(`Testing endpoint: ${url}`);
@@ -34,7 +60,8 @@ const testEndpoint = (url) => {
 
 // Test local endpoints
 console.log("=== TESTING LOCAL ENDPOINTS ===");
-testEndpoint('http://localhost:6060/actuator/health');
-setTimeout(() => testEndpoint('http://localhost:6060/api/surveyors'), 1000);
+console.log(`Using backend port: ${BACKEND_PORT}`);
+testEndpoint(`http://localhost:${BACKEND_PORT}/actuator/health`);
+setTimeout(() => testEndpoint(`http://localhost:${BACKEND_PORT}/api/surveyors`), 1000);
 
 // Remote endpoint testing removed - using localhost only

@@ -26,8 +26,13 @@ A React frontend for real-time surveyor location tracking and visualization usin
    The app will open at `http://localhost:3000`.
 
 ## Configuration
-- Backend host is set in `src/config.js` (default: `http://localhost:6060`).
-- Ensure CORS is enabled on the backend for `http://localhost:3000`.
+- Port configuration is centralized in `/deploy/config.sh` (see PORT_CONFIGURATION.md)
+- The React app automatically reads these settings from `src/config.js`
+- Run the port configuration script to change all ports in one place:
+  ```sh
+  ./configure-ports.sh
+  ```
+- Ensure CORS is enabled on the backend for the configured frontend port.
 
 ## Usage
 - Use the left panel to filter by city/project, select a surveyor, and pick a date range.

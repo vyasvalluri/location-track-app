@@ -36,7 +36,14 @@ public class SurveyorController {
     })
     @GetMapping
     public List<Surveyor> getAll() {
-        return service.listAll();
+        List<Surveyor> surveyors = service.listAll();
+        
+        // Update the online status for each surveyor based on their last activity
+        for (Surveyor surveyor : surveyors) {
+            surveyor.setOnline(service.isSurveyorOnline(surveyor.getId()));
+        }
+        
+        return surveyors;
     }
 
     @Operation(summary = "Create or update surveyor", description = "Creates a new surveyor or updates an existing one")
@@ -66,6 +73,9 @@ public class SurveyorController {
         
         if (isAuthenticated) {
             Surveyor surveyor = service.findByUsername(username);
+            // Update surveyor activity to mark them as online
+            service.updateSurveyorActivity(surveyor.getId());
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login successful");
@@ -91,5 +101,17 @@ public class SurveyorController {
         Map<String, Object> response = new HashMap<>();
         response.put("available", isAvailable);
         return ResponseEntity.ok(response);
+    }
+    
+    @Operation(summary = "Update surveyor activity", description = "Updates the last activity timestamp for a surveyor to mark them as online")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated status")
+    })
+    @PostMapping("/{id}/activity")
+    public ResponseEntity<Void> updateSurveyorActivity(
+            @Parameter(description = "Surveyor ID", required = true)
+            @PathVariable String id) {
+        service.updateSurveyorActivity(id);
+        return ResponseEntity.ok().build();
     }
 }

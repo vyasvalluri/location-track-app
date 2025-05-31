@@ -22,18 +22,27 @@ public class LocationTrackService {
     @Autowired
     private SurveyorRepository surveyorRepository;
 
+    @Autowired
+    private com.neogeo.tracking.service.SurveyorService surveyorService;
+    
     // Get surveyor online/offline status
     public Map<String, String> getSurveyorStatuses() {
         List<Surveyor> surveyors = surveyorRepository.findAll();
         Map<String, String> statusMap = new HashMap<>();
+        Map<String, Boolean> activityStatusMap = surveyorService.getAllSurveyorStatuses();
         
         // Get the current time
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime threshold = now.minusMinutes(5); // Consider offline if no update in 5 minutes
         
         for (Surveyor surveyor : surveyors) {
+            // Check both location tracking and activity tracking for better accuracy
             LocationTrack lastLocation = getLatestLocation(surveyor.getId());
-            boolean isOnline = lastLocation != null && lastLocation.getTimestamp().isAfter(threshold);
+            boolean isLocationActive = lastLocation != null && lastLocation.getTimestamp().isAfter(threshold);
+            boolean isActiveFromStatus = activityStatusMap.getOrDefault(surveyor.getId(), false);
+            
+            // Consider online if either method shows activity
+            boolean isOnline = isLocationActive || isActiveFromStatus;
             statusMap.put(surveyor.getId(), isOnline ? "Online" : "Offline");
         }
         
