@@ -10,7 +10,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +26,7 @@ import com.neogeo.tracking.model.LocationTrack;
 import com.neogeo.tracking.model.Surveyor;
 import com.neogeo.tracking.repository.LocationTrackRepository;
 import com.neogeo.tracking.service.SurveyorService;
+import com.neogeo.tracking.service.TracingService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,13 +48,16 @@ public class LocationTrackController {
     private final LocationTrackRepository repository;
     private final ObjectMapper objectMapper;
     private final SurveyorService surveyorService;
+    private final TracingService tracingService;
 
     public LocationTrackController(SimpMessagingTemplate messagingTemplate, 
                                  LocationTrackRepository repository,
-                                 SurveyorService surveyorService) {
+                                 SurveyorService surveyorService,
+                                 TracingService tracingService) {
         this.messagingTemplate = messagingTemplate;
         this.repository = repository;
         this.surveyorService = surveyorService;
+        this.tracingService = tracingService;
         this.objectMapper = new ObjectMapper()
             .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -117,53 +128,60 @@ public class LocationTrackController {
             @RequestBody LiveLocationMessage message,
             @Parameter(description = "Authorization header")
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        // Simple HTTP Basic Auth check
-        if (authHeader == null || !authHeader.startsWith("Basic ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
-        }
         
-        try {
-            String base64Credentials = authHeader.substring("Basic ".length());
-            String credentials = new String(Base64.getDecoder().decode(base64Credentials));
-            String[] values = credentials.split(":", 2);
-            
-            if (values.length != 2) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Authorization header");
-            }
-            
-            String username = values[0];
-            String password = values[1];
-            
-            // Use SurveyorService for authentication
-            boolean isAuthenticated = surveyorService.authenticateSurveyor(username, password);
-            if (!isAuthenticated) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-            }
-            
-            // Find the surveyor by username to get their ID
-            Surveyor surveyor = surveyorService.findByUsername(username);
-            if (surveyor != null) {
-                // Update activity to mark surveyor as online
-                surveyorService.updateSurveyorActivity(surveyor.getId());
-            }
-            
-            // 1. Broadcast via WebSocket as JSON string
-            String json = objectMapper.writeValueAsString(message);
-            System.out.println("Broadcasting live location: " + json);
-            messagingTemplate.convertAndSend("/topic/location/" + message.surveyorId, json);
-            
-            // 2. Save to DB (geom set to null to avoid PostGIS error)
-            LocationTrack entity = new LocationTrack(message.surveyorId, message.latitude, message.longitude, message.timestamp, null);
-            repository.save(entity);
-            
-            return ResponseEntity.ok("Location accepted");
-            
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing location data");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Base64 encoding in Authorization header");
-        }
+        // Start OpenTelemetry span for GPS location tracking
+        return tracingService.traceGpsOperation("location-update", 
+            message.surveyorId, 
+            1,  // Single GPS data point
+            () -> {
+                // Simple HTTP Basic Auth check
+                if (authHeader == null || !authHeader.startsWith("Basic ")) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+                }
+                
+                try {
+                    String base64Credentials = authHeader.substring("Basic ".length());
+                    String credentials = new String(Base64.getDecoder().decode(base64Credentials));
+                    String[] values = credentials.split(":", 2);
+                    
+                    if (values.length != 2) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Authorization header");
+                    }
+                    
+                    String username = values[0];
+                    String password = values[1];
+                    
+                    // Use SurveyorService for authentication
+                    boolean isAuthenticated = surveyorService.authenticateSurveyor(username, password);
+                    if (!isAuthenticated) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+                    }
+                    
+                    // Find the surveyor by username to get their ID
+                    Surveyor surveyor = surveyorService.findByUsername(username);
+                    if (surveyor != null) {
+                        // Update activity to mark surveyor as online
+                        surveyorService.updateSurveyorActivity(surveyor.getId());
+                    }
+                    
+                    // 1. Broadcast via WebSocket as JSON string
+                    String json = objectMapper.writeValueAsString(message);
+                    System.out.println("Broadcasting live location: " + json);
+                    messagingTemplate.convertAndSend("/topic/location/" + message.surveyorId, json);
+                    
+                    // 2. Save to DB (geom set to null to avoid PostGIS error)
+                    LocationTrack entity = new LocationTrack(message.surveyorId, message.latitude, message.longitude, message.timestamp, null);
+                    repository.save(entity);
+                    
+                    return ResponseEntity.ok("Location accepted");
+                    
+                } catch (JsonProcessingException e) {
+                    System.err.println("Error processing location data: " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing location data");
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Base64 encoding in Authorization header");
+                }
+            });
     }
 }
 

@@ -5,6 +5,18 @@ import CssBaseline from '@mui/material/CssBaseline';
 import SurveyorDashboard from './SurveyorDashboard';
 import SurveyorManagementPage from './pages/SurveyorManagementPage';
 import Login from './components/Login';
+import { initializeOpenTelemetry, getTracingService } from './tracing';
+
+// Initialize OpenTelemetry on app startup
+console.log('🚀 Starting Surveyor Tracking Dashboard with OpenTelemetry...');
+const tracer = initializeOpenTelemetry();
+const tracingService = getTracingService();
+
+// Trace app initialization
+const appInitSpan = tracingService.traceUserInteraction('app-init', 'app-root', {
+  'app.name': 'surveyor-tracking-dashboard',
+  'app.version': '1.0.0'
+});
 
 // Create a theme instance
 const theme = createTheme({
@@ -26,27 +38,50 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Trace app mount
+    const mountSpan = tracingService.traceUserInteraction('app-mount', 'app-component');
+    
     // Check if user is already logged in from localStorage
     const loggedInUser = localStorage.getItem('loggedInUser');
     if (loggedInUser) {
       try {
-        setUser(JSON.parse(loggedInUser));
+        const userData = JSON.parse(loggedInUser);
+        setUser(userData);
+        mountSpan.end({ 'auth.restored': true, 'user.id': userData.id });
       } catch (error) {
         console.error('Failed to parse stored user data', error);
         localStorage.removeItem('loggedInUser');
+        mountSpan.end({ 'auth.restored': false, 'auth.error': 'parse_error' });
       }
+    } else {
+      mountSpan.end({ 'auth.restored': false, 'auth.status': 'no_stored_user' });
     }
+    
     setLoading(false);
+    appInitSpan.end({ 'app.loaded': true });
   }, []);
 
   const handleLogin = (userData) => {
+    const loginSpan = tracingService.traceUserInteraction('login', 'auth-component', {
+      'user.id': userData.id,
+      'user.type': userData.type
+    });
+    
     setUser(userData);
     localStorage.setItem('loggedInUser', JSON.stringify(userData));
+    
+    loginSpan.end({ 'login.success': true });
   };
 
   const handleLogout = () => {
+    const logoutSpan = tracingService.traceUserInteraction('logout', 'auth-component', {
+      'user.id': user?.id
+    });
+    
     setUser(null);
     localStorage.removeItem('loggedInUser');
+    
+    logoutSpan.end({ 'logout.success': true });
   };
 
   // Protected route wrapper

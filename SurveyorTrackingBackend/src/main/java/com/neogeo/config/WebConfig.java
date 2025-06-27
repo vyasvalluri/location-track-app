@@ -13,23 +13,35 @@ import org.springframework.lang.NonNull;
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(@NonNull CorsRegistry registry) {
-        // Important: When using allowCredentials(true), we cannot use * for origins
-        registry.addMapping("/**")
-                .allowedOrigins(
-                        "http://localhost:3000", 
-                        "http://127.0.0.1:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                .allowCredentials(true)
-                .maxAge(3600); // Cache preflight requests for 1 hour
-        
-        // Log CORS configuration
-        System.out.println("CORS configuration set up with specific allowed origins: " + 
-                          "http://localhost:3000, http://127.0.0.1:3000");
-    }
+public void addCorsMappings(@NonNull CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins(
+            // Local development
+            "http://localhost:9898", 
+            "http://localhost:3000",
+            "http://localhost:6060",
+            "http://localhost:6565",
+            "http://127.0.0.1:9898",
+            // Production servers
+            "http://183.82.114.29:9898",
+            "http://183.82.114.29:6868", 
+            "http://183.82.114.29:6060",
+            "http://183.82.114.29:6565",
+            "http://183.82.114.29:3000",
+            // Allow file:// protocol for testing
+            "file://"
+        )
+        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedHeaders("*")
+        .exposedHeaders("Authorization")
+        .allowCredentials(false)  // Set to false for simpler CORS handling
+        .maxAge(3600);
 
+    // Uncomment the interceptor method below if this configuration doesn't work
+    System.out.println("*************CORS configuration updated with all required origins");
+}
+
+/* 
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(new HandlerInterceptor() {
@@ -41,7 +53,6 @@ public class WebConfig implements WebMvcConfigurer {
                 // Additional headers for remote access
                 response.setHeader("Connection", "keep-alive");
                 response.setHeader("X-Content-Type-Options", "nosniff");
-                response.setHeader("Access-Control-Allow-Origin", "*");
                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 response.setHeader("Access-Control-Allow-Headers", "*");
                 // Set cache control to prevent caching issues
@@ -51,5 +62,5 @@ public class WebConfig implements WebMvcConfigurer {
                 return true;
             }
         });
-    }
+    } */
 }

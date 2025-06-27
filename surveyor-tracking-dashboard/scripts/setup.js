@@ -3,20 +3,37 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// Path to the config.sh file
-const configShPath = path.join(__dirname, '..', 'deploy', 'config.sh');
+// Path to the config.sh file - try multiple locations
+const configShPaths = [
+  path.join(__dirname, '..', '..', 'deploy', 'config.sh'),  // From project root/deploy
+  path.join(__dirname, '..', 'deploy', 'config.sh'),       // Relative to frontend
+  path.join(__dirname, '..', '..', 'config.sh')            // From project root
+];
 // Path to the config.js file in the src directory
 const configJsPath = path.join(__dirname, '..', 'src', 'config.js');
 
 // Function to read port values from config.sh
 function readConfigSh() {
   console.log('Reading configuration from config.sh');
-  try {
-    if (!fs.existsSync(configShPath)) {
-      console.error('Config file not found:', configShPath);
-      return null;
+  
+  let configShPath = null;
+  // Try to find config.sh in multiple locations
+  for (const path of configShPaths) {
+    console.log(`Checking for config.sh at: ${path}`);
+    if (fs.existsSync(path)) {
+      configShPath = path;
+      console.log(`Found config.sh at: ${path}`);
+      break;
     }
-    
+  }
+  
+  if (!configShPath) {
+    console.log('Config.sh file not found in any of the expected locations:');
+    configShPaths.forEach(path => console.log(`  - ${path}`));
+    return null;
+  }
+  
+  try {
     const configContent = fs.readFileSync(configShPath, 'utf8');
     
     // Extract port values
@@ -24,10 +41,11 @@ function readConfigSh() {
     const frontendPortMatch = configContent.match(/FRONTEND_PORT=(\d+)/);
     const databasePortMatch = configContent.match(/DATABASE_PORT=(\d+)/);
     
-    const backendPort = backendPortMatch ? backendPortMatch[1] : '6060';
-    const frontendPort = frontendPortMatch ? frontendPortMatch[1] : '3000';
-    const databasePort = databasePortMatch ? databasePortMatch[1] : '5433';
+    const backendPort = backendPortMatch ? backendPortMatch[1] : '6565';
+    const frontendPort = frontendPortMatch ? frontendPortMatch[1] : '9898';
+    const databasePort = databasePortMatch ? databasePortMatch[1] : '5432';
     
+    console.log(`Successfully read config from ${configShPath}`);
     return { backendPort, frontendPort, databasePort };
   } catch (error) {
     console.error('Error reading config file:', error);
@@ -66,12 +84,14 @@ function updateConfigJs(ports) {
 // Main function
 function main() {
   console.log('Setting up port configuration...');
+  console.log('Current working directory:', process.cwd());
+  console.log('Script directory:', __dirname);
   
   let ports = readConfigSh();
   
   if (!ports) {
     console.log('Using default port values');
-    ports = { backendPort: '6060', frontendPort: '3000', databasePort: '5433' };
+    ports = { backendPort: '6565', frontendPort: '3000', databasePort: '5433' };
   }
   
   const success = updateConfigJs(ports);
@@ -83,6 +103,7 @@ function main() {
     console.log(`Database connection on port ${ports.databasePort}`);
   } else {
     console.error('Configuration failed');
+    process.exit(1);
   }
 }
 

@@ -38,9 +38,15 @@ const Login = ({ onLogin, onCancel }) => {
     try {
       // Import config dynamically to avoid circular dependencies
       const config = await import('../config').then(module => module.default);
+      console.log('Attempting login with backend at:', config.backendHost);
       const response = await fetch(`${config.backendHost}/api/surveyors/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'omit', // Don't send credentials 
         body: JSON.stringify(credentials),
       });
       

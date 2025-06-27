@@ -20,7 +20,7 @@ A Spring Boot backend for real-time surveyor location tracking with REST APIs an
    ```sh
    ./mvnw spring-boot:run
    ```
-   The backend will start on `http://localhost:6060`.
+   The backend will start on `http://localhost:6565`.
 
 ## API Endpoints
 - `GET /api/surveyors/filter` — Filter surveyors by city/project/status
@@ -34,7 +34,7 @@ A Spring Boot backend for real-time surveyor location tracking with REST APIs an
 The API documentation is available in two formats:
 
 1. Swagger UI (Interactive): 
-   - Start the application and visit http://localhost:6060/swagger-ui.html
+   - Start the application and visit http://localhost:6565/swagger-ui.html
    - Explore and test API endpoints directly from your browser
 
 2. Markdown Documentation:
@@ -48,7 +48,7 @@ The API documentation is available in two formats:
 ## Sample Data Insertion
 Example curl command:
 ```sh
-curl -X POST http://localhost:6060/api/live/location \
+curl -X POST http://localhost:6565/api/live/location \
   -H "Content-Type: application/json" \
   -d '{"surveyorId":"s001","latitude":17.385044,"longitude":78.486671,"timestamp":"2025-05-14T10:00:00"}'
 ```

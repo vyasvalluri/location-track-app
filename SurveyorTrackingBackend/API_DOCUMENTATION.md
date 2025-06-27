@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:6060/api
+http://localhost:6565/api
 ```
 
 ## Authentication Endpoints
@@ -233,7 +233,7 @@ Location accepted
 Connect to WebSocket endpoint and subscribe to location updates for specific surveyors.
 
 ```
-WebSocket: ws://localhost:6060/ws/location
+WebSocket: ws://localhost:6565/ws/location
 Subscribe to: /topic/location/{surveyorId}
 ```
 
@@ -263,7 +263,7 @@ Subscribe to: /topic/location/{surveyorId}
 4. Password fields are never returned in responses
 
 ## Base URL
-`http://localhost:6060`
+`http://localhost:6565`
 
 ## Authentication
 Most endpoints require no authentication. WebSocket/STOMP connections use basic authentication for live location updates.
@@ -383,7 +383,7 @@ Sample Response:
 
 #### Connect to WebSocket
 ```
-WebSocket URL: ws://localhost:6060/ws/location
+WebSocket URL: ws://localhost:6565/ws/location
 ```
 
 #### Subscribe to Live Updates
@@ -433,21 +433,21 @@ Sample Message:
    ```bash
    ./mvnw spring-boot:run
    ```
-3. Access Swagger UI: http://localhost:6060/swagger-ui.html
+3. Access Swagger UI: http://localhost:6565/swagger-ui.html
 
 ## Code Examples
 
 ### JavaScript/React (Using Fetch API)
 ```javascript
 // Get surveyor list
-fetch('http://localhost:6060/api/surveyors/filter?city=Mumbai')
+fetch('http://localhost:6565/api/surveyors/filter?city=Mumbai')
   .then(res => res.json())
   .then(surveyors => console.log(surveyors));
 
 // Get track history
 const from = new Date().toISOString();
 const to = new Date().toISOString();
-fetch(`http://localhost:6060/api/location/SURV001/track?from=${from}&to=${to}`)
+fetch(`http://localhost:6565/api/location/SURV001/track?from=${from}&to=${to}`)
   .then(res => res.json())
   .then(tracks => console.log(tracks));
 ```
@@ -458,7 +458,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 const client = new Client({
-  webSocketFactory: () => new SockJS('http://localhost:6060/ws/location'),
+  webSocketFactory: () => new SockJS('http://localhost:6565/ws/location'),
   onConnect: () => {
     client.subscribe('/topic/location/SURV001', message => {
       const location = JSON.parse(message.body);
@@ -473,10 +473,10 @@ client.activate();
 ### cURL Examples
 ```bash
 # Get surveyors
-curl http://localhost:6060/api/surveyors/filter?city=Mumbai
+curl http://localhost:6565/api/surveyors/filter?city=Mumbai
 
 # Push live location
-curl -X POST http://localhost:6060/api/live/location \
+curl -X POST http://localhost:6565/api/live/location \
   -H "Content-Type: application/json" \
   -d '{"surveyorId":"SURV001","latitude":17.385044,"longitude":78.486671}'
 ```

@@ -231,7 +231,7 @@ body {
 }
 
 .form-control:focus {
-  border-color: #6366f1;
+  border-color: #dbdbe8;
   outline: none;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
@@ -247,10 +247,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+  background: linear-gradient(45deg, #f0f0f4, #dfdde2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #4f46e5, #7c3aed);
+  background: linear-gradient(45deg, #f0f0f3, #ebe9ed);
 }

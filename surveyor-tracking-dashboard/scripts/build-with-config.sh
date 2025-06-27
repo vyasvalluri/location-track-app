@@ -10,7 +10,7 @@ extract_port() {
   if [[ -z "$port" ]]; then
     echo "Warning: Couldn't extract $port_name from config.js, using default"
     if [[ "$port_name" == "BACKEND_API" ]]; then
-      echo "6060"
+      echo "6565"
     elif [[ "$port_name" == "FRONTEND" ]]; then
       echo "3000"
     else

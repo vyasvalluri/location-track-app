@@ -1,3 +1,34 @@
+/* CRITICAL: Ensure OpenLayers vector layers are visible */
+.ol-viewport {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.ol-layers {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.ol-layer {
+  position: absolute !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Force vector layer visibility */
+.ol-layer canvas {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+/* Override any potential hiding of OpenLayers features */
+.ol-viewport * {
+  visibility: visible !important;
+}
+
 .ol-popup {
   position: absolute;
   background-color: white;
@@ -128,4 +159,44 @@
 .ol-overlay .ol-popup:before {
   pointer-events: none;
   z-index: 10001;
+}
+
+/* Live tracking styles */
+.live-tracking-marker {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Live tracking container */
+.map-container.live-tracking {
+  position: relative;
+}
+
+.map-container.live-tracking::after {
+  content: "🔴 LIVE";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(45deg, #ef4444, #dc2626);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }

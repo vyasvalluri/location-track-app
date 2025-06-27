@@ -11,7 +11,7 @@ A React frontend for real-time surveyor location tracking and visualization usin
 
 ## Prerequisites
 - Node.js 16+
-- Backend running at `http://localhost:6060` (see SurveyorTrackingBackend)
+- Backend running at `http://localhost:6565` (see SurveyorTrackingBackend)
 
 ## Setup
 1. Navigate to `surveyor-tracking-dashboard`.
