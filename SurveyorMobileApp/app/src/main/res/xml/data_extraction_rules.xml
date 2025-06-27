@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Allow backup of app data to Google Drive -->
+        <include domain="file" path="."/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Allow transfer of app data during device migration -->
+        <include domain="file" path="."/>
+    </device-transfer>
+</data-extraction-rules>
